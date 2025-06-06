@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시판</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* 커스텀 스타일 (Bootstrap 기본값 재정의 및 추가 스타일) */
+    body {
+      font-family: 'Noto Sans KR', sans-serif; /* Noto Sans KR 폰트 적용 (선택 사항) */
+      background-color: #f8f9fa; /* Bootstrap의 light 배경색과 유사 */
+    }
+
+    .container.py-4 {
+      padding-top: 2rem !important;
+      padding-bottom: 2rem !important;
+    }
+
+    h1 {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #343a40; /* Bootstrap dark 텍스트 색상 */
+    }
+
+    /* 버튼 그룹 정렬 */
+    .button-group {
+      text-align: right;
+      margin-bottom: 1.5rem; /* 버튼과 테이블 사이 간격 */
+    }
+
+    .button-group .btn {
+      margin-left: 0.5rem; /* 버튼 간 간격 */
+    }
+
+    /* 테이블 관련 커스텀 */
+    .table thead th {
+      font-weight: 600;
+      white-space: nowrap; /* 제목이 줄바꿈되지 않도록 */
+    }
+
+    .table tbody td {
+      vertical-align: middle; /* 셀 내용 중앙 정렬 */
+    }
+
+    .table tbody tr:hover {
+      background-color: #f5f5f5; /* 마우스 오버 효과 */
+    }
+
+    /* 페이징 버튼 커스텀 */
+    #pagination .btn {
+      padding: 0.375rem 0.75rem; /* Bootstrap small button 크기 */
+      font-size: 0.875rem; /* Bootstrap small button 폰트 크기 */
+    }
+
+    #pagination .btn:disabled {
+      opacity: 0.65; /* Bootstrap 기본 disabled opacity */
+      cursor: not-allowed;
+    }
+
+    #pageInfo {
+      font-weight: 500;
+      color: #343a40;
+      margin: 0 10px;
+    }
+
+    /* 반응형 테이블 (Bootstrap 기본 .table-responsive 사용 권장) */
+    /* 모바일에서 테이블이 가로로 스크롤되도록 */
+    @media (max-width: 767.98px) { /* Bootstrap sm breakpoint */
+      .table-responsive-sm {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+    /* Bootstrap의 .table-striped는 굳이 추가할 필요가 없음 */
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <h1 class="text-center" id="welcome-message">게시판</h1>
+
+  <div class="button-group">
+    <a th:href="@{/boards/write}" class="btn btn-primary">글쓰기</a>
+    <button onclick="logout();" class="btn btn-danger">로그아웃</button>
+  </div>
+
+  <div id="board" class="table-responsive-sm"> <table class="table table-striped table-hover"> <thead class="table-dark"> <tr>
+    <th>글 번호</th>
+    <th>제목</th>
+    <th>작성자</th>
+    <th>작성일</th>
+  </tr>
+  </thead>
+    <tbody id="boardContent">
+    <tr th:if="${#lists.isEmpty(boardList)}">
+      <td colspan="4" class="text-center py-4">등록된 게시글이 없습니다.</td>
+    </tr>
+    <tr th:each="board : ${boardList}">
+      <td th:text="${board.id}"></td>
+      <td><a th:href="@{/view/{id}(id=${board.id})}" th:text="${board.title}"></a></td>
+      <td th:text="${board.writer}"></td>
+      <td th:text="${#dates.format(board.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div id="pagination" class="d-flex justify-content-center mt-4"> <button id="prevPage" class="btn btn-outline-secondary" disabled>이전</button>
+    <span id="pageInfo" class="align-self-center mx-2">1</span> <button id="nextPage" class="btn btn-outline-secondary">다음</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

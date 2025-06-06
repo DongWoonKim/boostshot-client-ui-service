@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시글 상세보기</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* 커스텀 스타일 */
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 0;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 800px; /* 상세 보기 페이지 너비 조정 */
+      box-sizing: border-box;
+    }
+
+    .article-header {
+      border-bottom: 2px solid #dee2e6; /* Bootstrap border-bottom */
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .article-header h1 {
+      color: #343a40;
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      word-break: break-word; /* 긴 제목 처리 */
+    }
+
+    .article-info {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    .article-info strong {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .article-content {
+      min-height: 200px; /* 내용 영역 최소 높이 */
+      margin-bottom: 30px;
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: #343a40;
+      white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
+      word-break: break-word; /* 긴 단어 처리 */
+    }
+
+    .article-content p {
+      margin: 0;
+    }
+
+    .file-section {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 5px;
+      background-color: #f8f9fa;
+      margin-bottom: 30px;
+    }
+
+    .file-section h3 {
+      font-size: 1.3rem;
+      color: #343a40;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .file-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .file-section li {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #dee2e6;
+    }
+
+    .file-section li:last-child {
+      border-bottom: none;
+    }
+
+    .file-section .file-icon {
+      margin-right: 10px;
+      color: #007bff;
+      font-size: 1.2rem;
+    }
+
+    .file-section .file-name {
+      flex-grow: 1;
+      color: #343a40;
+      font-size: 1rem;
+    }
+
+    .file-section .download-btn {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+
+    .file-section .download-btn:hover {
+      color: #0056b3;
+    }
+
+    .article-footer {
+      display: flex;
+      justify-content: flex-end; /* 버튼들을 오른쪽 정렬 */
+      gap: 10px; /* 버튼 사이 간격 */
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* 버튼 스타일 */
+    .btn-back { /* 목록으로 돌아가기 */
+      background-color: #6c757d; /* secondary */
+      border-color: #6c757d;
+      color: #fff;
+    }
+    .btn-back:hover {
+      background-color: #565e64;
+      border-color: #565e64;
+    }
+
+    .btn-edit { /* 수정 */
+      background-color: #007bff; /* primary */
+      border-color: #007bff;
+      color: #fff;
+    }
+    .btn-edit:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .btn-delete { /* 삭제 */
+      background-color: #dc3545; /* danger */
+      border-color: #dc3545;
+      color: #fff;
+    }
+    .btn-delete:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 25px;
+        margin: 0 15px;
+      }
+      .article-header h1 {
+        font-size: 2rem;
+      }
+      .article-content {
+        font-size: 1rem;
+        min-height: 150px;
+      }
+      .article-footer {
+        flex-direction: column; /* 세로로 정렬 */
+        align-items: stretch; /* 가로 꽉 채우기 */
+        gap: 15px;
+      }
+      .btn {
+        width: 100%; /* 버튼 가로 꽉 채우기 */
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        padding: 20px;
+      }
+      .article-header h1 {
+        font-size: 1.8rem;
+      }
+      .article-info {
+        font-size: 0.85rem;
+      }
+      .file-section h3 {
+        font-size: 1.1rem;
+      }
+      .file-section .file-name,
+      .file-section .download-btn {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="article-header">
+    <h1 id="title">게시글 제목</h1>
+    <div class="article-info">
+      <span>작성자: <strong id="userId"></strong></span> |
+      <span>작성일: <strong id="created"></strong></span>
+    </div>
+  </div>
+
+  <div class="article-content">
+    <p id="content">게시글 내용</p>
+  </div>
+
+  <div class="file-section">
+    <h3>첨부 파일</h3>
+    <ul id="fileList">
+      <li style="text-align: center; color: #6c757d;">첨부된 파일이 없습니다.</li>
+    </ul>
+  </div>
+
+  <div class="article-footer">
+    <button class="btn btn-back" th:onclick="|location.href='@{/boards/list}'|">목록으로 돌아가기</button>
+    <button id="editBtn" onclick="editArticle()" class="btn btn-edit">수정</button>
+    <button id="deleteBtn" onclick="deleteArticle()" class="btn btn-delete">삭제</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
