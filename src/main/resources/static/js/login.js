@@ -21,9 +21,9 @@ let loginClicked = () => {
             dataType: 'json', // 서버에서 받을 데이터의 타입
             success: (response) => {
                 console.log('login :: ', response);
-                // localStorage.setItem('accessToken', response.accessToken);
+                localStorage.setItem('accessToken', response.accessToken);
                 // 로그인 성공 시 '/' 경로로 이동
-                // window.location.href = response.url;
+                window.location.href = '/';
             },
             error: (xhr) => {
                 if (xhr.status === 401) {
