@@ -1,6 +1,49 @@
-$(document).ready(() => {
+function handleTokenExpiration() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'POST',
+            url: '/auth/token',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: (response) => {
+                localStorage.setItem('accessToken', response.token);
+                setupAjax(); // 새 토큰 적용
+                resolve(); // ✅ resolve 호출
+            },
+            error: (error) => {
+                localStorage.removeItem('accessToken');
+                reject(error); // ✅ reject 호출
+            }
+        });
+    });
+}
 
-});
+function  setupAjax () {
+    // 모든 Ajax 요청에 JWT Access Token을 포함
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            let token = localStorage.getItem('accessToken'); // 저장된 Access Token 가져오기
+            if (token) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token); // Authorization 헤더에 Access Token 추가
+            }
+        }
+    });
+}
+
+async function checkout() {
+    let token = localStorage.getItem('accessToken');
+    if (!token || token.trim() === '') {
+        try {
+            await handleTokenExpiration();
+        } catch (e) {
+            alert('로그인이 필요합니다. 다시 로그인해주세요.');
+            window.location.href = '/users/login';
+        }
+    }
+}
 
 function logOut() {
     $.ajax({
